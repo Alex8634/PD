@@ -1,0 +1,34 @@
+#include <iostream>
+#include <Windows.h>
+#include <SetupAPI.h>
+#include <initguid.h>
+#include <devguid.h>
+
+#pragma comment(lib, "SetupAPI.lib")
+using namespace std;
+
+void func() {
+    HDEVINFO deviceInfoSet;
+    SP_DEVINFO_DATA deviceInfoData;
+    DWORD i = 0;
+    deviceInfoSet = SetupDiGetClassDevs(&GUID_DEVCLASS_USB, 0, 0, DIGCF_PRESENT);
+    deviceInfoData.cbSize = sizeof(SP_DEVINFO_DATA);
+
+    while (SetupDiEnumDeviceInfo(deviceInfoSet, i, &deviceInfoData)) 
+    {
+        char deviceName[256];
+        DWORD size = 0;
+        if (SetupDiGetDeviceInstanceIdA(deviceInfoSet, &deviceInfoData, deviceName, sizeof(deviceName), &size))
+        {
+            cout << "USB: " << deviceName << " nr " << i << endl;
+        }
+        i=i+1;
+    }
+    SetupDiDestroyDeviceInfoList(deviceInfoSet);
+}
+
+int main()
+{
+    func();
+    return 0;
+}
